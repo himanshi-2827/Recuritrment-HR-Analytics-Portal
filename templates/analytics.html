@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}HR Analytics · HireWise{% endblock %}
+{% block page_heading %}HR analytics & insights{% endblock %}
+{% block content %}
+<section class="analytics-intro"><div><span class="pill">DATA-DRIVEN HIRING</span><h2>Make every hiring decision clearer.</h2><p>Use these summary metrics to understand your current recruitment pipeline.</p></div><a class="button button-light" href="{{ url_for('export_report') }}">⇩ Download CSV report</a></section>
+<section class="stats-grid analytics-stats">
+  <article class="stat-card"><div class="stat-top"><span>Applications</span><span class="stat-icon purple">♙</span></div><strong>{{ total }}</strong><small>Total candidate records</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Hires</span><span class="stat-icon green">✓</span></div><strong>{{ hired }}</strong><small>Marked as hired</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Hire conversion</span><span class="stat-icon blue">↗</span></div><strong>{{ conversion }}%</strong><small>Hired ÷ total candidates</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Avg. hired experience</span><span class="stat-icon orange">◈</span></div><strong>{{ avg_exp }} <em>yrs</em></strong><small>Among candidates marked hired</small></article>
+</section>
+<section class="content-grid">
+<article class="panel"><div class="panel-heading"><div><h3>Candidate status distribution</h3><p>Where candidates currently sit</p></div></div><div class="chart-wrap chart-doughnut"><canvas id="statusChart"></canvas></div></article>
+<article class="panel"><div class="panel-heading"><div><h3>Applications by job role</h3><p>Compare candidate volume</p></div></div><div class="chart-wrap"><canvas id="roleChart"></canvas></div></article>
+</section>
+<section class="content-grid">
+<article class="panel"><div class="panel-heading"><div><h3>Pipeline breakdown</h3><p>Current stage counts</p></div></div><div class="table-scroll"><table><thead><tr><th>Status</th><th>Candidate count</th></tr></thead><tbody>{% for r in status_counts %}<tr><td><span class="status status-{{ r.status|lower|replace(' ','-') }}">{{ r.status }}</span></td><td><strong>{{ r.total }}</strong></td></tr>{% else %}<tr><td colspan="2">No data available.</td></tr>{% endfor %}</tbody></table></div></article>
+<article class="panel"><div class="panel-heading"><div><h3>Hires by job role</h3><p>Roles with successful hires</p></div></div><div class="role-list">{% for r in hires_by_role %}<div class="role-row"><div class="role-dot green-dot">✓</div><div class="role-info"><strong>{{ r.job_role }}</strong><small>{{ r.total }} hire(s)</small></div><b>{{ r.total }}</b></div>{% else %}<p class="empty">No hires recorded yet. Update candidate statuses to Hired.</p>{% endfor %}</div></article>
+</section>
+<div class="note-banner"><strong>💡 Hiring insight tip</strong><p>Review conversion rates together with interview feedback, role requirements, and consistent evaluation criteria. These summary metrics support decisions; they should not be used alone to judge candidates.</p></div>
+<script>
+const statusLabels = {{ status_counts|map(attribute='status')|list|tojson }};
+const statusValues = {{ status_counts|map(attribute='total')|list|tojson }};
+const roleLabels = {{ role_counts|map(attribute='job_role')|list|tojson }};
+const roleValues = {{ role_counts|map(attribute='total')|list|tojson }};
+const palette = ['#7467ef','#39a7d8','#f2a65a','#3dbb91','#ed7182','#8b9bb4'];
+new Chart(document.getElementById('statusChart'), {type:'doughnut',data:{labels:statusLabels,datasets:[{data:statusValues,backgroundColor:palette,borderWidth:0,hoverOffset:7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+new Chart(document.getElementById('roleChart'), {type:'bar',data:{labels:roleLabels,datasets:[{data:roleValues,backgroundColor:'#7467ef',borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0},grid:{color:'#eef0f6'}},x:{grid:{display:false}}}}});
+</script>
+{% endblock %}

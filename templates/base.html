@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}HireWise HR Portal{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-icon">✦</span><span>HireWise<small>HR ANALYTICS</small></span></a>
+      <div class="nav-label">WORKSPACE</div>
+      <nav>
+        <a class="{% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">▦ <span>Dashboard</span></a>
+        <a class="{% if request.endpoint in ['candidates','add_candidate','edit_candidate'] %}active{% endif %}" href="{{ url_for('candidates') }}">♙ <span>Candidates</span></a>
+        <a class="{% if request.endpoint == 'interviews' %}active{% endif %}" href="{{ url_for('interviews') }}">◷ <span>Interview Schedule</span></a>
+        <a class="{% if request.endpoint == 'analytics' %}active{% endif %}" href="{{ url_for('analytics') }}">▥ <span>HR Analytics</span></a>
+      </nav>
+      <div class="sidebar-bottom"><div class="avatar">HR</div><div><strong>HR Manager</strong><small>Recruitment team</small></div></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><div><span class="eyebrow">RECRUITMENT WORKSPACE</span><h1>{% block page_heading %}People, powered by insight.{% endblock %}</h1></div><a class="button button-primary" href="{{ url_for('add_candidate') }}">＋ Add Candidate</a></header>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+      <footer>HireWise · Recruitment & HR Analytics Portal <span>Built with Python + Flask + SQLite</span></footer>
+    </main>
+  </div>
+</body>
+</html>

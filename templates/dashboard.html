@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · HireWise{% endblock %}
+{% block page_heading %}People, powered by insight.{% endblock %}
+{% block content %}
+<section class="welcome-banner"><div><span class="pill">✦ RECRUITMENT OVERVIEW</span><h2>Build your next great team.</h2><p>Track candidates, plan interviews, and turn hiring data into clearer decisions.</p><a class="button button-light" href="{{ url_for('analytics') }}">Explore analytics ↗</a></div><div class="banner-art">♙<span>✦</span><i>＋</i></div></section>
+<section class="stats-grid">
+  <article class="stat-card"><div class="stat-top"><span>Total candidates</span><span class="stat-icon purple">♙</span></div><strong>{{ total }}</strong><small>All applications in the portal</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Active pipeline</span><span class="stat-icon blue">⇢</span></div><strong>{{ active }}</strong><small>Moving through hiring stages</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Interviews planned</span><span class="stat-icon orange">◷</span></div><strong>{{ interviews }}</strong><small>Scheduled candidate interviews</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Hired</span><span class="stat-icon green">✓</span></div><strong>{{ hired }}</strong><small>{{ conversion }}% of all recorded candidates</small></article>
+</section>
+<section class="content-grid">
+  <article class="panel"><div class="panel-heading"><div><h3>Hiring pipeline</h3><p>Candidate count by current status</p></div><a href="{{ url_for('analytics') }}">Full report ↗</a></div><div class="chart-wrap"><canvas id="pipelineChart"></canvas></div></article>
+  <article class="panel"><div class="panel-heading"><div><h3>Open role interest</h3><p>Applications by job role</p></div></div><div class="role-list">{% for role in roles %}<div class="role-row"><div class="role-dot">{{ loop.index }}</div><div class="role-info"><strong>{{ role.job_role }}</strong><div class="progress"><span style="width: {{ (role.total / total * 100) if total else 0 }}%"></span></div></div><b>{{ role.total }}</b></div>{% else %}<p class="empty">No roles yet.</p>{% endfor %}</div></article>
+</section>
+<section class="panel"><div class="panel-heading"><div><h3>Recently added candidates</h3><p>Keep an eye on the latest applications.</p></div><a href="{{ url_for('candidates') }}">View all candidates →</a></div>
+<div class="table-scroll"><table><thead><tr><th>Candidate</th><th>Job role</th><th>Experience</th><th>Status</th><th>Applied</th></tr></thead><tbody>
+{% for c in recent %}<tr><td><div class="person"><span class="person-avatar">{{ c.name[:1]|upper }}</span><div><strong>{{ c.name }}</strong><small>{{ c.email }}</small></div></div></td><td>{{ c.job_role }}</td><td>{{ c.experience }} yrs</td><td><span class="status status-{{ c.status|lower|replace(' ','-') }}">{{ c.status }}</span></td><td>{{ c.created_at }}</td></tr>{% else %}<tr><td colspan="5" class="empty">No candidates yet. Add your first candidate to get started.</td></tr>{% endfor %}
+</tbody></table></div></section>
+<script>
+const statusLabels = {{ status_counts|map(attribute='status')|list|tojson }};
+const statusValues = {{ status_counts|map(attribute='total')|list|tojson }};
+new Chart(document.getElementById('pipelineChart'), {
+ type:'bar', data:{labels:statusLabels,datasets:[{label:'Candidates',data:statusValues,backgroundColor:['#7467ef','#39a7d8','#f2a65a','#3dbb91','#ed7182','#8b9bb4'],borderRadius:7,borderSkipped:false,maxBarThickness:42}]},
+ options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0},grid:{color:'#eef0f6'}},x:{grid:{display:false}}}}
+});
+</script>
+{% endblock %}

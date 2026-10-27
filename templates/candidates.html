@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Candidates · HireWise{% endblock %}
+{% block page_heading %}Candidate directory{% endblock %}
+{% block content %}
+<section class="panel">
+  <div class="panel-heading"><div><h3>All candidates</h3><p>Search, review, and update your recruitment pipeline.</p></div><a class="button button-outline" href="{{ url_for('export_report') }}">⇩ Export CSV</a></div>
+  <form class="filters" method="get"><input type="search" name="q" placeholder="Search name, email, or role…" value="{{ q }}"><select name="status"><option value="">All statuses</option>{% for s in statuses %}<option value="{{ s }}" {% if selected_status == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select><button class="button button-dark">Filter</button><a class="button button-ghost" href="{{ url_for('candidates') }}">Reset</a></form>
+  <div class="table-scroll"><table><thead><tr><th>Candidate</th><th>Job role</th><th>Experience</th><th>Status</th><th>Interview</th><th>Actions</th></tr></thead><tbody>
+  {% for c in candidates %}<tr><td><div class="person"><span class="person-avatar">{{ c.name[:1]|upper }}</span><div><strong>{{ c.name }}</strong><small>{{ c.email }}{% if c.phone %} · {{ c.phone }}{% endif %}</small></div></div></td><td>{{ c.job_role }}</td><td>{{ c.experience }} yrs</td><td><span class="status status-{{ c.status|lower|replace(' ','-') }}">{{ c.status }}</span></td><td>{{ c.interview_date|replace('T',' ') if c.interview_date else '—' }}</td><td><div class="actions"><a href="{{ url_for('edit_candidate', candidate_id=c.id) }}">Edit</a><form method="post" action="{{ url_for('delete_candidate', candidate_id=c.id) }}" onsubmit="return confirm('Delete this candidate?')"><button class="link-danger">Delete</button></form></div></td></tr>
+  {% else %}<tr><td colspan="6" class="empty">No matching candidates found.</td></tr>{% endfor %}
+  </tbody></table></div><p class="table-note">Showing {{ candidates|length }} candidate(s).</p>
+</section>
+{% endblock %}

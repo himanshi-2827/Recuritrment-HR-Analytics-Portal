@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · HireWise{% endblock %}
+{% block page_heading %}{{ page_title }}{% endblock %}
+{% block content %}
+<section class="panel form-panel"><div class="panel-heading"><div><h3>Candidate information</h3><p>Fields marked * are required.</p></div><span class="form-symbol">♙</span></div>
+<form method="post" class="candidate-form">
+  <label>Full name *<input name="name" required value="{{ candidate.name if candidate else '' }}" placeholder="e.g. Aanya Sharma"></label>
+  <label>Email address *<input type="email" name="email" required value="{{ candidate.email if candidate else '' }}" placeholder="candidate@example.com"></label>
+  <label>Phone number<input name="phone" value="{{ candidate.phone if candidate else '' }}" placeholder="+91 98765 43210"></label>
+  <label>Job role *<input name="job_role" required value="{{ candidate.job_role if candidate else '' }}" placeholder="e.g. Python Developer"></label>
+  <label>Experience (years)<input type="number" name="experience" min="0" max="60" step="0.5" value="{{ candidate.experience if candidate else '0' }}"></label>
+  <label>Recruitment status<select name="status">{% for s in statuses %}<option value="{{ s }}" {% if candidate and candidate.status == s %}selected{% elif not candidate and s == 'Applied' %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></label>
+  <label>Interview date & time<input type="datetime-local" name="interview_date" value="{{ candidate.interview_date if candidate else '' }}"></label>
+  <label>Interviewer<input name="interviewer" value="{{ candidate.interviewer if candidate else '' }}" placeholder="Interviewer name"></label>
+  <label class="full-width">Notes<textarea name="notes" rows="4" placeholder="Skills, feedback, or follow-up notes…">{{ candidate.notes if candidate else '' }}</textarea></label>
+  <div class="form-actions full-width"><a class="button button-ghost" href="{{ url_for('candidates') }}">Cancel</a><button class="button button-primary">Save Candidate ✓</button></div>
+</form></section>
+{% endblock %}
